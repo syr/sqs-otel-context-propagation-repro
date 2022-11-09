@@ -41,7 +41,7 @@ aws sqs create-queue --queue-name=ColliderQueue --profile localstack --endpoint-
 
 ## Send messages to the queue
 
-Simply use Intellij HTTP Client requests: `test.http`
+Simply use Intellij HTTP Client requests (Intellij IDEA Ultimate): `test.http`
 
 Alternatively use curl:
 
