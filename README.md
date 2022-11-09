@@ -59,7 +59,9 @@ curl http://localhost:8080/sync/shield
 Expected context propagation via sqs message (aws sdk2) to work automatically as it was fixed/implemented in https://github.com/open-telemetry/opentelemetry-java-instrumentation/pull/6199
 having send and receive logs in the same traceId.
 
-Instead, receive has a new traceId, e.g.
+
+## Actual behaviour
+Instead, receive is associated with a new traceId, e.g.
 ```
 11:19:47 INFO  traceId=92dbb93c5ba9bd564e0307eb4b157788 [or.ac.sq.QuarksCannonSyncResource] (executor-thread-0) Fired Quark[Charm, 1/2}]
 11:19:57 INFO  traceId=19fd77d0c37fdf31ed0b140314d02ced [or.ac.sq.QuarksShieldSyncResource] (executor-thread-0) before receive
