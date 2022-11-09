@@ -1,0 +1,22 @@
+POST http://localhost:8080/sync/cannon/shoot
+Content-Type: application/json
+
+{"flavor":"Charm","spin":"1/2"}
+
+<> 2022-11-05T124918.200.txt
+<> 2022-11-05T111948.200.txt
+<> 2022-11-05T111806.200.txt
+<> 2022-11-05T111451.200.txt
+<> 2022-11-05T111144.200.txt
+<> 2022-11-05T110834.200.txt
+
+### GET request with a header
+GET http://localhost:8080/sync/shield
+Accept: application/json
+
+<> 2022-11-05T124922.200.json
+<> 2022-11-05T111957.200.json
+<> 2022-11-05T111829.200.json
+<> 2022-11-05T111504.200.json
+<> 2022-11-05T111252.200.json
+
