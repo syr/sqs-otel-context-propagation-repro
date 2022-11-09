@@ -4,10 +4,9 @@ This example showcases how to use the AWS SQS client with Quarkus. As a prerequi
 
 
 # Setup reproducer quarkus app (amazon-sqs-quickstart)
-- download otel agent: https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/tag/v1.19.2
-- config otel agent with env var: 
+- config otel agent with env var (I included otel agent jar in the project to simplify setup, was donwloaded from https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/tag/v1.19.2): 
  ```
-JAVA_TOOL_OPTIONS=-javaagent:C:/Users/X/IdeaProjects/otel/opentelemetry-javaagent.jar -Dotel.traces.exporter=none -Dotel.metrics.exporter=none
+JAVA_TOOL_OPTIONS=-javaagent:./otel/opentelemetry-javaagent.jar -Dotel.traces.exporter=none -Dotel.metrics.exporter=none
 ```
 - start quarkus app (amazon-sqs-quickstart), for example simply in intellij
   - alternatively by:  `./mvnw clean quarkus:dev`
