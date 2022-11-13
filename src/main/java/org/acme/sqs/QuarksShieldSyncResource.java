@@ -1,5 +1,6 @@
 package org.acme.sqs;
 
+import java.util.HexFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -7,7 +8,13 @@ import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanContext;
+import io.opentelemetry.api.trace.TraceFlags;
+import io.opentelemetry.api.trace.TraceState;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.Scope;
 import io.quarkus.logging.Log;
 import io.quarkus.scheduler.Scheduled;
 import org.acme.sqs.model.Quark;
@@ -35,13 +42,22 @@ public class QuarksShieldSyncResource {
 
     static ObjectReader QUARK_READER = new ObjectMapper().readerFor(Quark.class);
 
-//    @GET
     @Scheduled(every = "3s")
+    public void scheduledMethod(){
+        Span span = createSpanLinkedToParent();
+        try (Scope scope = span.makeCurrent()) {
+            receive();
+        } finally {
+            span.end();
+        }
+    }
+
+//    @GET
     public void receive() {
-        Log.info("receive");
         //update traceId in MDC so we can see it in the logs
         MDC.put("traceId", Span.current().getSpanContext().getTraceId());
         MDC.put("spanId", Span.current().getSpanContext().getTraceId());
+        Log.info("receive");
 //        List<Message> messages = sqs.receiveMessage(m -> m.maxNumberOfMessages(10).queueUrl(queueUrl)).messages();
 //
 //        //update traceId in MDC so we can see it in the logs (just in case the sqs.receiveMessage changed the Span.current().getSpanContext())
@@ -56,6 +72,34 @@ public class QuarksShieldSyncResource {
 //            .map(Message::body)
 //            .map(this::toQuark)
 //            .collect(Collectors.toList());
+    }
+
+    /*
+    https://stackoverflow.com/questions/72668718/how-to-create-context-using-traceid-in-open-telemetry
+     */
+    private static Span createSpanLinkedToParent() {
+        // Fetch the trace and span IDs from wherever you've stored them
+//        String traceIdHex = System.getProperty("otel.traceid");
+//        String spanIdHex = System.getProperty("otel.spanid");
+
+
+
+        String traceIdHex =  HexFormat.of().formatHex("123".getBytes());
+        String spanIdHex = HexFormat.of().formatHex("456".getBytes());
+
+        Log.info("traceIdHex: " + traceIdHex);
+        Log.info("spanIdHex: " + spanIdHex);
+
+        SpanContext remoteContext = SpanContext.createFromRemoteParent(
+                traceIdHex,
+                spanIdHex,
+                TraceFlags.getSampled(),
+                TraceState.getDefault());
+
+        return GlobalOpenTelemetry.getTracer("")
+                .spanBuilder("root span name")
+                .setParent(Context.current().with(Span.wrap(remoteContext)))
+                .startSpan();
     }
 
     private Quark toQuark(String message) {
