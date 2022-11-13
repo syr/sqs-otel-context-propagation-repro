@@ -36,10 +36,6 @@ public class QuarksCannonSyncResource {
     @Path("/shoot")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response sendMessage(Quark quark) throws Exception {
-        //update traceId in MDC so we can see it in the logs
-        MDC.put("traceId", Span.current().getSpanContext().getTraceId());
-        MDC.put("spanId", Span.current().getSpanContext().getSpanId());
-
         String message = QUARK_WRITER.writeValueAsString(quark);
         SendMessageResponse response = sqs.sendMessage(m -> m.queueUrl(queueUrl).messageBody(message));
         LOGGER.infov("Fired Quark[{0}, {1}}]", quark.getFlavor(), quark.getSpin());

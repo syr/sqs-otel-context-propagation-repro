@@ -36,15 +36,7 @@ public class QuarksShieldSyncResource {
 
     @GET
     public List<Quark> receive() {
-        //update traceId in MDC so we can see it in the logs
-        MDC.put("traceId", Span.current().getSpanContext().getTraceId());
-        MDC.put("spanId", Span.current().getSpanContext().getTraceId());
         List<Message> messages = sqs.receiveMessage(m -> m.maxNumberOfMessages(10).queueUrl(queueUrl)).messages();
-
-        //update traceId in MDC so we can see it in the logs (just in case the sqs.receiveMessage changed the Span.current().getSpanContext())
-        MDC.put("traceId", Span.current().getSpanContext().getTraceId());
-        MDC.put("spanId", Span.current().getSpanContext().getTraceId());
-        Log.info("after receiveMessage");
 
         //delete received message(s)
         messages.forEach(m -> sqs.deleteMessage(DeleteMessageRequest.builder().queueUrl(queueUrl).receiptHandle(m.receiptHandle()).build()));
