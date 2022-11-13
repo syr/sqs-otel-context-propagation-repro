@@ -11,6 +11,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import io.opentelemetry.api.trace.Span;
+import io.quarkus.logging.Log;
+import io.quarkus.scheduler.Scheduled;
 import org.acme.sqs.model.Quark;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
@@ -18,8 +20,8 @@ import org.jboss.logging.MDC;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.SendMessageResponse;
 
-@Path("/sync/cannon")
-@Produces(MediaType.TEXT_PLAIN)
+//@Path("/sync/cannon")
+//@Produces(MediaType.TEXT_PLAIN)
 public class QuarksCannonSyncResource {
 
     private static final Logger LOGGER = Logger.getLogger(QuarksCannonSyncResource.class);
@@ -32,17 +34,19 @@ public class QuarksCannonSyncResource {
 
     static ObjectWriter QUARK_WRITER = new ObjectMapper().writerFor(Quark.class);
 
-    @POST
-    @Path("/shoot")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response sendMessage(Quark quark) throws Exception {
+//    @POST
+//    @Path("/shoot")
+//    @Consumes(MediaType.APPLICATION_JSON)
+    @Scheduled(every = "3s")
+    public void sendMessage() throws Exception {
         //update traceId in MDC so we can see it in the logs
         MDC.put("traceId", Span.current().getSpanContext().getTraceId());
         MDC.put("spanId", Span.current().getSpanContext().getSpanId());
 
-        String message = QUARK_WRITER.writeValueAsString(quark);
-        SendMessageResponse response = sqs.sendMessage(m -> m.queueUrl(queueUrl).messageBody(message));
-        LOGGER.infov("Fired Quark[{0}, {1}}]", quark.getFlavor(), quark.getSpin());
-        return Response.ok().entity(response.messageId()).build();
+//        String message = QUARK_WRITER.writeValueAsString(quark);
+//        SendMessageResponse response = sqs.sendMessage(m -> m.queueUrl(queueUrl).messageBody(message));
+//        LOGGER.infov("Fired Quark[{0}, {1}}]", quark.getFlavor(), quark.getSpin());
+        Log.info("sendMessage");
+//        return Response.ok().entity(response.messageId()).build();
     }
 }
